@@ -1,5 +1,5 @@
 # CS361-microservice-A-sorting
-This contains the CS 361 Microservice A created by Lauren for Allisons program. The microservice sorts lists alphabetically, or in ascending or descending order by weight.
+This contains the CS 361 Microservice A created by Lauren for Allison's program. The microservice sorts lists alphabetically, or in ascending or descending order by weight.
 
 # A. To request data from the microservice:
 
@@ -49,3 +49,4 @@ deserialized_sorted_list = pickle.loads(sorted_list_serialized)
 ```
 
 # UML sequence diagram:
+![UML diagram](UML.png)
