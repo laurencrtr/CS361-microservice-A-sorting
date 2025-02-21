@@ -49,3 +49,4 @@ deserialized_sorted_list = pickle.loads(sorted_list_serialized)
 ```
 
 # UML sequence diagram:
+![UML diagram](UML.png)
