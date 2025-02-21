@@ -22,47 +22,55 @@ context = zmq.Context()
 socket = context.socket(zmq.REP)
 socket.bind("tcp://*:5556")
 
+print("The sorting microservice is active.")
+def sort_list():
+    while True:
+        try:
+            received_info = socket.recv_multipart()                     # Receives [list, string]
+                                                                        # list is serialized and the string is encoded
 
-while True:
-    try:
-        received_info = socket.recv_multipart()                     # Receives [list, string]
-                                                                    # list is serialized and the string is encoded
+            unsorted_list = pickle.loads(received_info[0])              # deserialize the unsorted list sent to the microservice
 
-        unsorted_list = pickle.loads(received_info[0])              # deserialize the unsorted list sent to the microservice
-
-        sort_type = received_info[1].decode()                       # decode the option for sorting type chosen by the user
-        sort_type = sort_type.upper()                               # so user choice is not case-sensitive
+            sort_type = received_info[1].decode()                       # decode the option for sorting type chosen by the user
+            sort_type = sort_type.upper()                               # so user choice is not case-sensitive
 
 
-        if sort_type == 'A':
-            # unsorted_list.sort()                                  # can be used if we want sorting to be case-sensitive
-            sorted_pokemon = sorted(unsorted_list, key=str.lower)   # sorting that is not case-sensitive
-            sorted_list = pickle.dumps(sorted_pokemon)
-            socket.send(sorted_list)
+            if sort_type == 'A':
+                # unsorted_list.sort()                                  # can be used if we want sorting to be case-sensitive
+                sorted_pokemon = sorted(unsorted_list, key=str.lower)   # sorting that is not case-sensitive
+                sorted_list = pickle.dumps(sorted_pokemon)
+                print("Your list was successfully sorted.")
+                socket.send(sorted_list)
 
-        elif sort_type == 'WI':
-            # split at the last space in the string,
-            # turn the number after the space into float value,
-            # sort in ascending order based on number
-            unsorted_list.sort(key = lambda wt: float(wt.rsplit(' ',1)[1]))
-            sorted_list = pickle.dumps(unsorted_list)
-            socket.send(sorted_list)
+            elif sort_type == 'WI':
+                # split at the last space in the string,
+                # turn the number after the space into float value,
+                # sort in ascending order based on number
+                unsorted_list.sort(key = lambda wt: float(wt.rsplit(' ',1)[1]))
+                sorted_list = pickle.dumps(unsorted_list)
+                print("Your list was successfully sorted.")
+                socket.send(sorted_list)
 
-        elif sort_type == 'WD':
-            # split at the last space in the string,
-            # turn the number after the space into float value,
-            # sort in descending order based on number
-            unsorted_list.sort(key = lambda wt: float(wt.rsplit(' ',1)[1]), reverse = True)
-            sorted_list = pickle.dumps(unsorted_list)
-            socket.send(sorted_list)
+            elif sort_type == 'WD':
+                # split at the last space in the string,
+                # turn the number after the space into float value,
+                # sort in descending order based on number
+                unsorted_list.sort(key = lambda wt: float(wt.rsplit(' ',1)[1]), reverse = True)
+                sorted_list = pickle.dumps(unsorted_list)
+                print("Your list was successfully sorted.")
+                socket.send(sorted_list)
 
-        else:
-            error_message = ["**Error** Please make sure the string sent to the sorting microservice is 'A', 'WD', or 'WI'"]
+            else:
+                print("The sorting microservice was unable to process your request due to invalid input.")
+                error_message = ["**Error** Please make sure the string sent to the sorting microservice is 'A', 'WD', or 'WI'"]
+                error_message_serial = pickle.dumps(error_message)
+                socket.send(error_message_serial)
+
+
+        except:
+            print("The sorting microservice was unable to process your request due to invalid input.")
+            error_message = ['**Error** The sorting microservice was unable to process your request due to invalid input.']
             error_message_serial = pickle.dumps(error_message)
             socket.send(error_message_serial)
 
-
-    except:
-        error_message = ['**Error** The sorting microservice was unable to process your request.']
-        error_message_serial = pickle.dumps(error_message)
-        socket.send(error_message_serial)
+sort_list()
